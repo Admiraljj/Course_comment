@@ -1,47 +1,12 @@
 package main
 
 import (
+	"Backend/models"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql" // 导入 MySQL 驱动
 )
-
-// User 模型
-type User struct {
-	gorm.Model
-	Username string `gorm:"type:varchar(20);not null"`
-	Password string `gorm:"type:varchar(20);not null"`
-	Role     string `gorm:"type:varchar(10);not null"`
-	Email    string `gorm:"type:varchar(255);not null"`
-}
-
-// Course 模型
-type Course struct {
-	gorm.Model
-	CourseName string `gorm:"type:varchar(50);not null"`
-	Credits    int    `gorm:"not null"`
-	CourseType string `gorm:"type:varchar(50);not null"`
-	TeacherId  int    `gorm:"not null"`
-}
-
-// Comment 模型
-type Comment struct {
-	gorm.Model
-	CourseId    int    `gorm:"not null"`
-	UserId      int    `gorm:"not null"`
-	CommentText string `gorm:"type:text;not null"`
-	CommentDate string `gorm:"type:datetime;not null"`
-}
-
-// Rating 模型
-type Rating struct {
-	gorm.Model
-	CourseId   int    `gorm:"not null"`
-	UserId     int    `gorm:"not null"`
-	Rating     int    `gorm:"not null"`
-	RatingDate string `gorm:"type:datetime;not null"`
-}
 
 func main() {
 	r := gin.Default()
@@ -57,7 +22,7 @@ func main() {
 		fmt.Println("Database connection failed, exiting...")
 		return
 	}
-	db.AutoMigrate(&User{}, &Course{}, &Comment{}, &Rating{})
+	db.AutoMigrate(&models.User{}, &models.Course{}, &models.Comment{})
 
 }
 
