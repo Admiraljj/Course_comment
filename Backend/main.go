@@ -11,7 +11,6 @@ import (
 
 func main() {
 	r := gin.Default()
-	controllers.Helloworld(r)
 	db := conf.InitDB()
 	if db != nil {
 		defer db.Close()
@@ -19,7 +18,7 @@ func main() {
 		fmt.Println("Database connection failed, exiting...")
 		return
 	}
-	db.AutoMigrate(&models.User{}, &models.Course{}, &models.Comment{})
+	db.AutoMigrate(&models.User{}, &models.Course{}, &models.Comment{}, &models.Rating{})
 	controllers.UserControllers(r, db)
 	controllers.CourseControllers(r, db)
 	err := r.Run()

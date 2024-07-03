@@ -2,6 +2,7 @@ package util
 
 import (
 	"Backend/models"
+	"errors"
 	"github.com/dgrijalva/jwt-go"
 	"time"
 )
@@ -48,5 +49,5 @@ func ParseToken(tokenString string) (*models.User, error) {
 		}
 		return user, nil
 	}
-	return nil, err
+	return nil, errors.New("invalid token")
 }
