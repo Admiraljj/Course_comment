@@ -4,12 +4,14 @@ import (
 	"Backend/models"
 	"errors"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/jinzhu/gorm"
 	"time"
 )
 
 var mySigningKey = []byte("Admiraljj")
 
 type MyClaims struct {
+	ID       uint   `json:"id"`
 	Username string `json:"username"`
 	Email    string `json:"email"`
 	Role     string `json:"role"`
@@ -18,6 +20,7 @@ type MyClaims struct {
 
 func GenerateToken(user models.User) string {
 	c := MyClaims{
+		ID:       user.ID,
 		Username: user.Username,
 		Email:    user.Email,
 		Role:     user.Role,
@@ -43,6 +46,9 @@ func ParseToken(tokenString string) (*models.User, error) {
 	}
 	if claims, ok := token.Claims.(*MyClaims); ok && token.Valid {
 		user := &models.User{
+			Model: gorm.Model{
+				ID: claims.ID,
+			},
 			Username: claims.Username,
 			Email:    claims.Email,
 			Role:     claims.Role,

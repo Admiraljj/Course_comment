@@ -3,16 +3,26 @@ package controllers
 import (
 	"Backend/models"
 	"Backend/util"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"net/http"
+	"time"
 )
 
 func CourseControllers(r *gin.Engine, db *gorm.DB) {
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:3000"}, // 替换为你的前端地址
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Authorization", "Content-Type"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
 	addCourse(r, db)
 	getAllCourses(r, db)
 	deleteCourse(r, db)
-	GetCourseIDByCourseNameAndTeacherName(r, db)
+	getCourseInfoById(r, db)
 }
 
 func addCourse(r *gin.Engine, db *gorm.DB) {
@@ -84,17 +94,13 @@ func getAllCourses(r *gin.Engine, db *gorm.DB) {
 }
 
 func deleteCourse(r *gin.Engine, db *gorm.DB) {
-	r.DELETE("/course/delete", func(c *gin.Context) {
+	r.GET("/course/delete/:id", func(c *gin.Context) {
 		token := c.GetHeader("Authorization")
 		if token == "" {
 			util.RespondError(c, http.StatusBadRequest, 1, "token不能为空")
 			return
 		}
-		var course models.Course
-		if err := c.ShouldBind(&course); err != nil {
-			util.RespondError(c, http.StatusBadRequest, 2, err.Error())
-			return
-		}
+
 		user, _ := util.ParseToken(token)
 		// 从数据库中检查用户是否存在，且角色为管理员
 		var existingUser models.User
@@ -102,56 +108,38 @@ func deleteCourse(r *gin.Engine, db *gorm.DB) {
 			util.RespondError(c, http.StatusBadRequest, 3, "用户不存在或无权限")
 			return
 		}
-		// 检查课程名是否为空
-		if course.CourseName == "" {
-			util.RespondError(c, http.StatusBadRequest, 4, "课程名不能为空")
+
+		// 获取路径参数
+		courseID := c.Param("id")
+
+		// 根据 CourseID 删除课程, 同时删除 ratings 和 comments
+		if err := db.Where("id = ?", courseID).Delete(&models.Course{}).Error; err != nil {
+			util.RespondError(c, http.StatusInternalServerError, 4, err.Error())
 			return
 		}
-		// 检查教师ID是否为空
-		if course.TeacherName == "" {
-			util.RespondError(c, http.StatusBadRequest, 5, "教师名称不能为空")
+		if err := db.Where("course_id = ?", courseID).Delete(&models.Rating{}).Error; err != nil {
+			util.RespondError(c, http.StatusInternalServerError, 5, err.Error())
 			return
 		}
-		// 检查课程是否存在，需要课程名和教师名一致
-		var existingCourse models.Course
-		if err := db.Where("course_name = ? AND teacher_name = ?", course.CourseName, course.TeacherName).First(&existingCourse).Error; err != nil {
-			util.RespondError(c, http.StatusBadRequest, 6, "课程不存在")
-			return
-		}
-		// 删除课程
-		if err := db.Delete(&course).Error; err != nil {
-			util.RespondError(c, http.StatusInternalServerError, 7, err.Error())
+		if err := db.Where("course_id = ?", courseID).Delete(&models.Comment{}).Error; err != nil {
+			util.RespondError(c, http.StatusInternalServerError, 6, err.Error())
 			return
 		}
 
 		util.RespondSuccess(c, gin.H{
-			"course": course.CourseName + "删除成功",
+			"message": "课程删除成功",
 		})
 	})
 }
 
-func GetCourseIDByCourseNameAndTeacherName(r *gin.Engine, db *gorm.DB) {
-	r.POST("/course", func(c *gin.Context) {
+func getCourseInfoById(r *gin.Engine, db *gorm.DB) {
+	r.GET("/course/:course_id", func(c *gin.Context) {
+		courseId := c.Param("course_id")
 		var course models.Course
-		if err := c.ShouldBind(&course); err != nil {
+		if err := db.Where("id = ?", courseId).First(&course).Error; err != nil {
 			util.RespondError(c, http.StatusBadRequest, 1, err.Error())
 			return
 		}
-		if course.CourseName == "" {
-			util.RespondError(c, http.StatusBadRequest, 2, "课程名不能为空")
-			return
-		}
-		if course.TeacherName == "" {
-			util.RespondError(c, http.StatusBadRequest, 3, "教师名不能为空")
-			return
-		}
-		var existingCourse models.Course
-		if err := db.Where("course_name = ? AND teacher_name = ?", course.CourseName, course.TeacherName).First(&existingCourse).Error; err != nil {
-			util.RespondError(c, http.StatusBadRequest, 4, "课程不存在")
-			return
-		}
-		util.RespondSuccess(c, gin.H{
-			"course_id": existingCourse.ID,
-		})
+		util.RespondSuccess(c, course)
 	})
 }

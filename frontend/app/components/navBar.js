@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {Modal, Button, Form, Input, message} from 'antd';
 import UserService from '../../src/service/UserService';
+import Link from "next/link";
 
 const userService = new UserService();
 
@@ -77,16 +78,18 @@ const Navbar = () => {
 
     return (
         <div className="fixed top-0 left-0 w-full h-20 bg-blue-500 bg-opacity-60 backdrop-filter backdrop-blur-md shadow-md z-50 flex items-center justify-between px-4">
-            <div className="flex items-center border-r-2 border-gray-300 pr-4">
-                <img
-                    src="/usst.png" // 替换为你的图片路径
-                    alt="Logo"
-                    className="mr-4"
-                />
-                <span className="text-white text-xl font-semibold">
-                    上理的课
-                </span>
-            </div>
+            <Link href="/">
+                <div className="flex items-center border-r-2 border-gray-300 pr-4">
+                    <img
+                        src="/usst.png" // 替换为你的图片路径
+                        alt="Logo"
+                        className="mr-4"
+                    />
+                    <span className="text-white text-xl font-semibold">
+                        上理的课
+                    </span>
+                </div>
+            </Link>
             <div className="flex items-center pr-32">
                 <img
                     src="/avatar.jpg" // 替换为你的头像路径

@@ -85,7 +85,7 @@ const Courses = () => {
     }
 
     return (
-        <div className="flex justify-center items-center min-h-screen py-10">
+        <div className="flex justify-center min-h-screen py-10">
             <div className="w-full max-w-4xl">
                 <div className="flex mb-4">
                     <Input.Search

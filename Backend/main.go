@@ -20,7 +20,10 @@ func main() {
 	}
 	db.AutoMigrate(&models.User{}, &models.Course{}, &models.Comment{}, &models.Rating{})
 	controllers.UserControllers(r, db)
+	controllers.CommentControllers(r, db)
 	controllers.CourseControllers(r, db)
+	controllers.RatingControllers(r, db)
+
 	err := r.Run()
 	if err != nil {
 		return
