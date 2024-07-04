@@ -16,7 +16,7 @@ const CourseDetail = () => {
     const [newComment, setNewComment] = useState('');
     const [rating, setRating] = useState(0);
     const [averageRating, setAverageRating] = useState(0);
-    const desc = ['terrible', 'bad', 'normal', 'good', 'wonderful'];
+    const desc = ['非常差', '孬', '一般', '好', '棒极啦'];
 
     useEffect(() => {
         if (id) {

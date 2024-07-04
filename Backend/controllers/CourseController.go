@@ -21,7 +21,7 @@ func CourseControllers(r *gin.Engine, db *gorm.DB) {
 	}))
 	addCourse(r, db)
 	getAllCourses(r, db)
-	deleteCourse(r, db)
+	deleteCourseById(r, db)
 	getCourseInfoById(r, db)
 }
 
@@ -93,7 +93,7 @@ func getAllCourses(r *gin.Engine, db *gorm.DB) {
 	})
 }
 
-func deleteCourse(r *gin.Engine, db *gorm.DB) {
+func deleteCourseById(r *gin.Engine, db *gorm.DB) {
 	r.GET("/course/delete/:id", func(c *gin.Context) {
 		token := c.GetHeader("Authorization")
 		if token == "" {

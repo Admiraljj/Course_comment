@@ -1,7 +1,7 @@
 'use client';
 
 import Navbar from "../../app/components/navBar";
-import CoursesDisplay from "../../app/components/CoursesDisplay.js";
+import CourseManagement from "../../app/components/CourseManagement";
 import React from "react";
 
 function Index() {
@@ -9,6 +9,7 @@ function Index() {
     return (
         <>
             <Navbar/>
+            <CourseManagement/>
         </>
 
     );
